@@ -8,7 +8,7 @@ To get started with the LibraryMVC project, follow these steps:
 
 1. **Clone the repository**:
 
-https://github.com/pbruzgielewicz/LibraryMVC
+https://github.com/pbruzgielewicz/LibraryMVC.git
 
 2. **Navigate to the project directory**:
 
