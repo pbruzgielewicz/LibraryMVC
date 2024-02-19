@@ -7,7 +7,7 @@ public class Book
     public int BookId { get; set; }
 
     [Required]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [Display(Name = "Author")]
     public int AuthorId { get; set; }

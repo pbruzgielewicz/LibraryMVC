@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryMVC.Areas.Identity.Data;
+using LibraryMVC.Dto;
 using LibraryMVC.Models;
 
 namespace LibraryMVC.Controllers
@@ -52,20 +48,23 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: User/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoCreate
-        public async Task<IActionResult> Create([Bind("UserId,Username,Email")] User user)
+        public async Task<IActionResult> Create(AddUserDto addUser)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                var userToAdd = new User
+                {
+                    Username = addUser.Username,
+                    Email = addUser.Email
+                };
+                
+                _context.Add(userToAdd);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View();
         }
 
         // GET: User/Edit/5
@@ -85,39 +84,20 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: User/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoEdit
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,Username,Email")] User user)
+        public async Task<IActionResult> Edit(EditUserDto editUser)
         {
-            if (id != user.UserId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.UserId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentUser = await _context.User!.FirstOrDefaultAsync(x => x.UserId == editUser.UserId);
+                currentUser!.Username = editUser.Username;
+                currentUser.Email = editUser.Email;
+
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View();
         }
 
         // GET: User/Delete/5

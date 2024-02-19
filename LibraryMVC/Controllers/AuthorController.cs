@@ -48,16 +48,12 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Author/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Create([Bind("AuthorId,Name,DateOfBirth")] Author author)
         public async Task<IActionResult> Create(AddAuthorDto addAuthor)
         {
             if (ModelState.IsValid)
             {
-                //Dodac do reszty create jak ponizej zachowujac forme Dto
                 var authorToAdd = new Author()
                 {
                     Name = addAuthor.Name,
@@ -87,11 +83,8 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Author/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Name,DateOfBirth")] Author author)
         public async Task<IActionResult> Edit ( EditAuthorDto editAuthorDto)
         {
             if (ModelState.IsValid)

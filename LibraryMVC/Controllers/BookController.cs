@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryMVC.Areas.Identity.Data;
+using LibraryMVC.Dto;
 using LibraryMVC.Models;
 
 namespace LibraryMVC.Controllers
@@ -22,7 +19,7 @@ namespace LibraryMVC.Controllers
         // GET: Book
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Book.Include(b => b.Author);
+            var applicationDbContext = _context.Book!.Include(b => b.Author);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -53,21 +50,23 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Book/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoCreate
-        public async Task<IActionResult> Create([Bind("Title,AuthorId")] Book book)
+        public async Task<IActionResult> Create(AddBookDto addBook)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
+                var bookToAdd = new Book()
+                {
+                    Title = addBook.Title,
+                    AuthorId = addBook.AuthorId
+                };
+                _context.Add(bookToAdd);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Author, "AuthorId", "Name", book.AuthorId);
-            return View(book);
+            ViewData["AuthorId"] = new SelectList(_context.Author, "AuthorId", "Name", addBook.AuthorId);
+            return View();
         }
 
         // GET: Book/Edit/5
@@ -88,40 +87,21 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Book/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoEdit
-        public async Task<IActionResult> Edit(int id, [Bind("BookId,Title,AuthorId,GenreId")] Book book)
+        public async Task<IActionResult> Edit(EditBookDto editBookDto)
         {
-            if (id != book.BookId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.BookId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentBook = await _context.Book!.FirstOrDefaultAsync(x => x.BookId == editBookDto.BookId);
+                currentBook!.Title = editBookDto.Title;
+                currentBook.AuthorId = editBookDto.AuthorId;
+                
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Author, "AuthorId", "Name", book.AuthorId);
-            return View(book);
+            ViewData["AuthorId"] = new SelectList(_context.Author, "AuthorId", "Name", editBookDto.AuthorId);
+            return View();
         }
 
         // GET: Book/Delete/5

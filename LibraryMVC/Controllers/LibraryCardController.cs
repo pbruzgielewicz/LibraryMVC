@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryMVC.Areas.Identity.Data;
+using LibraryMVC.Dto;
 using LibraryMVC.Models;
 
 namespace LibraryMVC.Controllers
@@ -53,21 +50,26 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: LibraryCard/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoCreate
-        public async Task<IActionResult> Create([Bind("LibraryCardId,CardNumber,IssuedAt,ExpiryDate,UserId")] LibraryCard libraryCard)
+        public async Task<IActionResult> Create(AddLibraryCardDto addLibraryCard)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(libraryCard);
+                var libraryCardToAdd = new LibraryCard()
+                {
+                    CardNumber = addLibraryCard.CardNumber,
+                    IssuedAt = addLibraryCard.IssuedAt,
+                    ExpiryDate = addLibraryCard.ExpiryDate,
+                    UserId = addLibraryCard.UserId
+                };
+                
+                _context.Add(libraryCardToAdd);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.User, "UserId", "Email", libraryCard.UserId);
-            return View(libraryCard);
+            ViewData["UserId"] = new SelectList(_context.User, "UserId", "Email",addLibraryCard.UserId);
+            return View();
         }
 
         // GET: LibraryCard/Edit/5
@@ -88,40 +90,23 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: LibraryCard/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoEdit
-        public async Task<IActionResult> Edit(int id, [Bind("LibraryCardId,CardNumber,IssuedAt,ExpiryDate,UserId")] LibraryCard libraryCard)
+        public async Task<IActionResult> Edit(EditLibraryCardDto editLibraryCard)
         {
-            if (id != libraryCard.LibraryCardId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(libraryCard);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LibraryCardExists(libraryCard.LibraryCardId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentLibraryCard = await _context.LibraryCard!.FirstOrDefaultAsync(x => x.LibraryCardId == editLibraryCard.LibraryCardId);
+                currentLibraryCard!.CardNumber = editLibraryCard.CardNumber;
+                currentLibraryCard.IssuedAt = editLibraryCard.IssuedAt;
+                currentLibraryCard.ExpiryDate = editLibraryCard.ExpiryDate;
+                currentLibraryCard.UserId = editLibraryCard.UserId;
+                
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.User, "UserId", "Email", libraryCard.UserId);
-            return View(libraryCard);
+            ViewData["UserId"] = new SelectList(_context.User, "UserId", "Email", editLibraryCard.UserId);
+            return View();
         }
 
         // GET: LibraryCard/Delete/5

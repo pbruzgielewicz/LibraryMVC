@@ -8,7 +8,7 @@ public class LibraryCard
 
     [Required]
     [Display(Name = "Card Number")]
-    public string CardNumber { get; set; }
+    public string? CardNumber { get; set; }
 
     [Required]
     [Display(Name = "Issued At")]

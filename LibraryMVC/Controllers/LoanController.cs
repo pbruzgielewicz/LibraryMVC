@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryMVC.Areas.Identity.Data;
+using LibraryMVC.Dto;
 using LibraryMVC.Models;
 
 namespace LibraryMVC.Controllers
@@ -55,22 +52,28 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Loan/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoCreate
-        public async Task<IActionResult> Create([Bind("LoanId,BookId,LibraryCardId,LoanDate,DueDate,ReturnDate")] Loan loan)
+        public async Task<IActionResult> Create(AddLoanDto addLoan)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(loan);
+                var loanToAdd = new Loan()
+                {
+                    LoanDate = addLoan.LoanDate,
+                    DueDate = addLoan.DueDate,
+                    ReturnDate = addLoan.ReturnDate,
+                    BookId = addLoan.BookId,
+                    LibraryCardId = addLoan.LibraryCardId
+                };
+                
+                _context.Add(loanToAdd);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookId"] = new SelectList(_context.Book, "BookId", "Title", loan.BookId);
-            ViewData["LibraryCardId"] = new SelectList(_context.LibraryCard, "LibraryCardId", "CardNumber", loan.LibraryCardId);
-            return View(loan);
+            ViewData["BookId"] = new SelectList(_context.Book, "BookId", "Title", addLoan.BookId);
+            ViewData["LibraryCardId"] = new SelectList(_context.LibraryCard, "LibraryCardId", "CardNumber", addLoan.LibraryCardId);
+            return View();
         }
 
         // GET: Loan/Edit/5
@@ -92,41 +95,25 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Loan/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // TODO Zamien Bind na dtoEdit
-        public async Task<IActionResult> Edit(int id, [Bind("LoanId,BookId,LibraryCardId,LoanDate,DueDate,ReturnDate")] Loan loan)
+        public async Task<IActionResult> Edit(EditLoanDto editLoan)
         {
-            if (id != loan.LoanId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(loan);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LoanExists(loan.LoanId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var currentLoan = await _context.Loan!.FirstOrDefaultAsync(x => x.LoanId == editLoan.LoanId);
+                currentLoan!.LoanDate = editLoan.LoanDate;
+                currentLoan.DueDate = editLoan.DueDate;
+                currentLoan.ReturnDate = editLoan.ReturnDate;
+                currentLoan.LibraryCardId = editLoan.LibraryCardId;
+                currentLoan.BookId = editLoan.BookId;
+                
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookId"] = new SelectList(_context.Book, "BookId", "Title", loan.BookId);
-            ViewData["LibraryCardId"] = new SelectList(_context.LibraryCard, "LibraryCardId", "CardNumber", loan.LibraryCardId);
-            return View(loan);
+            ViewData["BookId"] = new SelectList(_context.Book, "BookId", "Title", editLoan.BookId);
+            ViewData["LibraryCardId"] = new SelectList(_context.LibraryCard, "LibraryCardId", "CardNumber", editLoan.LibraryCardId);
+            return View();
         }
 
         // GET: Loan/Delete/5
