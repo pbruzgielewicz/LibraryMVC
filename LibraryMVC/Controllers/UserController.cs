@@ -56,7 +56,8 @@ namespace LibraryMVC.Controllers
             {
                 var userToAdd = new User
                 {
-                    Username = addUser.Username,
+                    FirstName = addUser.FirstName,
+                    LastName = addUser.LastName,
                     Email = addUser.Email
                 };
                 
@@ -91,7 +92,8 @@ namespace LibraryMVC.Controllers
             if (ModelState.IsValid)
             {
                 var currentUser = await _context.User!.FirstOrDefaultAsync(x => x.UserId == editUser.UserId);
-                currentUser!.Username = editUser.Username;
+                currentUser!.FirstName = editUser.FirstName;
+                currentUser.LastName = editUser.LastName;
                 currentUser.Email = editUser.Email;
 
                 await _context.SaveChangesAsync();

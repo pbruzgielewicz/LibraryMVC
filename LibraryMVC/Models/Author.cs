@@ -7,6 +7,7 @@ public class Author
     public int AuthorId { get; set; }
 
     [Required]
+    [RegularExpression("^[a-zA-Z]*$", ErrorMessage = "Name should contains letters only.")]
     public string? Name { get; set; }
 
     [Display(Name = "Date of Birth")]

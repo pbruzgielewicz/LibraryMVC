@@ -4,18 +4,19 @@ using Microsoft.EntityFrameworkCore;
 using LibraryMVC.Areas.Identity.Data;
 using LibraryMVC.Dto;
 using LibraryMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryMVC.Controllers
 {
     public class LoanController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context; 
 
         public LoanController(ApplicationDbContext context)
         {
             _context = context;
         }
-
+        
         // GET: Loan
         public async Task<IActionResult> Index()
         {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using LibraryMVC.Areas.Identity.Data;
 using LibraryMVC.Dto;
 using LibraryMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryMVC.Controllers
 {
@@ -15,6 +16,7 @@ namespace LibraryMVC.Controllers
             _context = context;
         }
 
+        
         // GET: Author
         public async Task<IActionResult> Index()
         {
@@ -42,6 +44,7 @@ namespace LibraryMVC.Controllers
         }
 
         // GET: Author/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -65,8 +68,9 @@ namespace LibraryMVC.Controllers
             }
             return View();
         }
-
+        
         // GET: Author/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Author == null)
@@ -101,6 +105,7 @@ namespace LibraryMVC.Controllers
         }
 
         // GET: Author/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Author == null)
@@ -119,6 +124,7 @@ namespace LibraryMVC.Controllers
         }
 
         // POST: Author/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

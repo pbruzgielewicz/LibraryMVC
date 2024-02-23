@@ -13,8 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
-// TODO: item do logowania po imieniu i nazwisku - zmien na mail i haslo jak w widokach 
-    /*private class ApplicationUserEntityConfiguration :
+    private class ApplicationUserEntityConfiguration :
         IEntityTypeConfiguration<ApplicationUser>
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
@@ -22,10 +21,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             builder.Property(x => x.FirstName).HasMaxLength(255);
             builder.Property(x => x.LastName).HasMaxLength(255);
         }
-    }*/
+    }
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        //dodano
         base.OnModelCreating(builder);
+        builder.Entity<User>()
+            .HasOne(u => u.LibraryCard)
+            .WithOne(lc => lc.User)
+            .HasForeignKey<LibraryCard>(lc => lc.UserId); 
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
